@@ -1,0 +1,17 @@
+Information about the rescale tool
+==================================
+
+The rescale tool takes a number of 32-bit little-endian floating point
+binary files, finds the extents of the data across all the files, and
+rescales them within some percentile boundaries whilst writing them
+out individually as 8-bit files.
+
+It combines two common operations across n files that are performed
+post-reconstuction
+
+Who made this?
+==============
+
+Dr. Richard Boardman, Dr. Neil O'Brien
+µ-VIS X-ray Imaging Centre
+Copyright (c) 2016 University of Southampton
