@@ -47,6 +47,7 @@ const char *RESCALE_COPYRIGHT = "Copyright (c) 2016, 2017 University of Southamp
 #define ERR_FAILED_TO_OPEN_THE_FILE_DESPITE_EVERYTHING_ELSE 8
 #define ERR_BAD_THRESHOLD 9
 #define ERR_FAILED_TO_READ_A_VALUE_FROM_AN_OPEN_FILE 10
+#define ERR_FAILED_TO_OPEN_VGI_FILE 11
 
 /* function prototypes */
 

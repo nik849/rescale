@@ -7,7 +7,8 @@
 
   Rescales one or more 32-bit floating point raw data files against a percentile range
   and outputs the results as a series of 8-bit unsigned char datasets
-  
+
+  Modified 2019 Nick Hale
  */
 
 #include <stdio.h>
@@ -23,7 +24,7 @@
 #include <errno.h>
 
 
-/* 
+/*
    assumes all free input parameters are 32-bit datasets
    output files to be with a suffix indicating they've been procesed
 
@@ -73,7 +74,7 @@ int64_t get_filesize(const char *filename)
 {
 #ifdef WINDOWS
   struct __stat64 st;
-  if (_stat64(filename, &st) == 0)    
+  if (_stat64(filename, &st) == 0)
 #else
   struct stat st;
   if (stat(filename, &st) == 0)
@@ -81,9 +82,28 @@ int64_t get_filesize(const char *filename)
     {
       return st.st_size;
     }
-  return -1;  
+  return -1;
 }
-
+int read_vgi(char *vgi_filename)
+{
+  int count = 0;
+  char *x, *y, *z;
+  char line[256];
+  FILE *input_file = fopen(vgi_filename, "rb");
+  if (input_file == NULL)
+    {
+      printf("Error opening .vgi file - are you sure it's in the same dir?");
+      return ERR_FAILED_TO_OPEN_VGI_FILE 11
+    }
+  while (fgets(line, sizeof line, input_file) != NULL)
+  {
+    if (count == 3)
+    {
+     printf("%s\n", line)
+     //do something here
+    }
+  }
+}
 int read_first_value(char *filename, raw_t *target)
 {
   FILE *infile;
@@ -127,7 +147,7 @@ int read_first_value(char *filename, raw_t *target)
    //printf("%s\n",strerror(errno));
   // closing the file causes segfaults even if not null -- what (!?)
   fclose(infile);
-  
+
   return 0;
 }
 
@@ -171,9 +191,9 @@ uint64_t find_minmax_values(char *filename, raw_t *minval, raw_t *maxval, uint64
 	  if (buffer[u] > *maxval) { *maxval = buffer[u]; }
 	}
       //printf("outloop\n");
-      printf(" - min/max values now %0.4f / %0.4f\r", (float)*minval, (float)*maxval);      
+      printf(" - min/max values now %0.4f / %0.4f\r", (float)*minval, (float)*maxval);
     }
-    
+
   fclose(infile);
   printf("\n");
   return total_size_read;
@@ -187,12 +207,12 @@ uint64_t build_histogram(char *filename, uint64_t *histogram, raw_t minval, floa
   int bin;
   infile = fopen(filename, "rb");
   printf("Working on file %s\n", filename);
-  
+
   while(!feof(infile))
     {
       read_elements = fread(buffer, sizeof(raw_t), bufcount, infile);
       total_size_read += read_elements * sizeof(raw_t);
-      
+
       printf("Read %" PRIu64 " bytes of %" PRIu64 " (%0.3f of %0.3f GiB, (%0.3f MiB/s), %0.2f%%)\r",
 	     total_size_read,
 	     total_size_input,
@@ -200,7 +220,7 @@ uint64_t build_histogram(char *filename, uint64_t *histogram, raw_t minval, floa
 	     (float)total_size_input / GIBI,
 	     ((float)total_size_read / MEBI) / (time(NULL)-clk_split),
 	     100*(float)total_size_read / (float)total_size_input);
-      
+
       for (u = 0; u < read_elements; u++)
 	{
 #ifdef UINT16
@@ -208,7 +228,7 @@ uint64_t build_histogram(char *filename, uint64_t *histogram, raw_t minval, floa
 	  if (buffer[u] == 0 || buffer[u] == 65535 ) { continue; }
 #endif
 	  bin = (int)(bin_factor * (buffer[u] - minval));
-	  
+
 	  histogram[bin]++;
 	}
     }
@@ -222,7 +242,7 @@ uint64_t calculate_number_of_values(uint64_t *histogram, int nbins)
   unsigned int i;
   for (i=0; i<nbins; i++)
     {
-      nvals += histogram[i];    
+      nvals += histogram[i];
     }
 
   return nvals;
@@ -236,7 +256,7 @@ void convert_data(char *input_file, char *output_file, raw_t *inbuffer, unsigned
   infile = fopen(input_file, "rb");
   outfile = fopen(output_file, "wb");
   size_t read_elements;
-  
+
   while(!feof(infile))
     {
       read_elements = fread(inbuffer, sizeof(raw_t), buffer_count, infile);
@@ -255,7 +275,7 @@ void convert_data(char *input_file, char *output_file, raw_t *inbuffer, unsigned
 	  else if (val > 255) { val = 255; }
 	  outbuffer[u] = (unsigned char)val;
 	}
-	 
+
       *total_size_written += read_elements * sizeof(unsigned char);
       fwrite(outbuffer, sizeof(unsigned char), read_elements, outfile);
       printf(" - written %" PRIu64 " bytes (%0.3f GiB)\r", *total_size_written, (float)*total_size_written / GIBI);
@@ -285,7 +305,7 @@ int main(int argc, char **argv)
   char **output_files; /* names of output files */
   char *processed_suffix; /* suffix for output files */
   uint64_t buffer_count; /* number of elements in a buffer */
-  
+
   /* initialise some values */
   i = 0;
   nvals = 0;
@@ -297,13 +317,13 @@ int main(int argc, char **argv)
   buffer_count = BUFFER_COUNT;
   nbins = DEFAULT_HISTOGRAM_BINS;
   threshold = THRESHOLD;
-  processed_suffix = malloc(sizeof(char) * (1+strlen(PROCESSED_SUFFIX)));  
+  processed_suffix = malloc(sizeof(char) * (1+strlen(PROCESSED_SUFFIX)));
   snprintf(processed_suffix, sizeof(char)*(1+strlen(PROCESSED_SUFFIX)), "%s", PROCESSED_SUFFIX);
   time(&clk_start);
 
-  /* dump information before we start doing anything */  
+  /* dump information before we start doing anything */
   info();
-  
+
   /* sanity check */
   if (sizeof(float) != 4) /* really, I should switch this type out ... */
     {
@@ -369,7 +389,7 @@ int main(int argc, char **argv)
   /* allocate buffers */
   inbuffer = (raw_t*)malloc(sizeof(raw_t) * buffer_count);
   outbuffer = (unsigned char*)malloc(sizeof(unsigned char*) * buffer_count);
-  
+
   /* alright, I need to explain this calloc here. There appears to be
      a peculiar bug buried in at least my version of glibc which
      causes this to either segfault or throw up an error 'corrupted
@@ -382,9 +402,9 @@ int main(int argc, char **argv)
      number of bins is requested. Cost: sizeof(uint64_t) in
      memory, and no difference in behaviour (other than it no longer
      segfaults) as we're still only working up to nbins in our loop. */
-  
+
   histogram = (uint64_t *)calloc(nbins + (nbins % 2), sizeof(uint64_t));
-  
+
   num_input_files = argc - optind; /* how many input files do we have? */
 
   if (num_input_files < 1)
@@ -412,7 +432,7 @@ int main(int argc, char **argv)
 	  printf("%s is not a readable file. Please check and try again\n", argv[a]);
 	  return ERR_UNREADABLE_FILE_UNSURPRISINGLY_CANNOT_BE_READ;
 	}
-      
+
       int64_t fsize = get_filesize(argv[a]);
       if (fsize == -1)
 	{
@@ -425,7 +445,7 @@ int main(int argc, char **argv)
 	  printf("Total size to read is now %" PRIu64 " (%0.4f GiB)\n", total_size_input, (float)total_size_input / GIBI);
 
 	  /* add this to the list */
-	  input_files[i] = (char *)malloc(sizeof(char) * (1+strlen(argv[a])));	 
+	  input_files[i] = (char *)malloc(sizeof(char) * (1+strlen(argv[a])));
 	  output_files[i] = (char *)malloc(sizeof(char) * (1+strlen(argv[a])+strlen(processed_suffix)));
 	  snprintf(input_files[i], sizeof(char)*(1+strlen(argv[a])), "%s", argv[a]);
 	  snprintf(output_files[i], sizeof(char)*(1+strlen(argv[a])+strlen(processed_suffix)), "%s%s", argv[a], processed_suffix);
@@ -438,11 +458,11 @@ int main(int argc, char **argv)
   /* set the low and high boundaries for saturation threshold */
   t_low = threshold;
   t_high = 1-t_low;
-  
+
   printf("Saturation threshold set - percentiles between %0.2f%% and %0.2f%% will be considered\n", 100*t_low, 100*t_high);
 
-  
-  
+
+
   // printf("&maxval is %f\n\n\n", &maxval);
   /* read the first value of the first file and assign this to max/minval */
    if (read_first_value(input_files[0], &maxval) != 0)
@@ -468,7 +488,7 @@ int main(int argc, char **argv)
   time(&clk_split);
   total_size_read = 0;
   bfac = ((float)nbins) / range; /* inverted; could overload binsize for inner loop below */
-  
+
   printf("\n[Read pass 2/3: constructing histogram]\n");
   for (i=0; i<num_input_files; i++)
     {
@@ -482,7 +502,7 @@ int main(int argc, char **argv)
   highval = maxval;
 
   printf("\n[Finding min/max percentile extents in histogram]\n");
-  
+
   for (i=0; i<nbins; i++)
     {
      pvals += (float)histogram[i] / (float)nvals;
@@ -498,11 +518,11 @@ int main(int argc, char **argv)
  printf("Scaling range is set to %0.4f\n", scalerange);
 
  /* reset counters */
- total_size_written = 0; 
+ total_size_written = 0;
  total_size_read = 0;
 
  printf("\n[Read pass 3/3: performing conversion and writing output]\n");
- 
+
  for (i=0; i<num_input_files; i++)
    {
      convert_data(input_files[i], output_files[i], inbuffer, outbuffer, lowval, scalerange, buffer_count, &total_size_read, &total_size_written, total_size_input);
@@ -520,6 +540,6 @@ int main(int argc, char **argv)
  free(input_files);
 
  printf("Total processing time was %0.4f minutes\n", (float)(time(NULL)-clk_start)/60.0f);
- 
+
  return OK;
 }

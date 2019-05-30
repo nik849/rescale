@@ -1,0 +1,99 @@
+{volume1}
+[representation]
+size = 1000 1000 1200
+resamplemode = not activated
+mirror = 0 0 0 0
+datatype = unsigned integer
+datarange = 0 65535
+bitsperelement = 16
+[file1]
+RegionOfInterestStart = 0 0 0
+RegionOfInterestEnd = 999 999 1199
+FileFormat = raw
+Size = 1000 1000 1200
+Name = 20181123_BT_2100_DJB_trial_4pt_bend.vol
+Datatype = float
+datarange = -0.0510258 0.517309
+BitsPerElement = 32
+{volumeprimitive1}
+[section1]
+min = 0
+max = 65535
+offset = 0
+name = section [0]
+[geometry]
+status = visible
+relativeposition = 0 0 0
+position = -1.48936 -1.48936 1.48936
+resolution = 0.0047 0.0047 0.0047
+scale = 1 1 1
+center = 500 500 600
+rotate = 1 0 0 0 1 0 0 0 1
+unit = mm
+[volume]
+volume = volume1
+[description]
+text = 20181123_BT_2100_DJB_trial_4pt_bend
+[segment1]
+status = activated
+description = 0
+opacityx = 0 5884 65535
+redx = 0 65535
+greenx = 0 65535
+bluex = 0 65535
+opacityvalue = 0 0 2
+redvalue = 255 255
+greenvalue = 255 255
+bluevalue = 255 255
+{default}
+[version]
+release = VGStudioMax 1.2.1 (build 352)
+{scene}
+[viewer]
+perspective = activated
+viewing angle = 30
+position = 0 5940.32 0
+oversampling = 1
+up = 0 0 1
+lookat = 0 0 0
+resultsize = 256 256
+[perspective]
+status = activated
+[light1]
+diffuse = 0.333 0.333 0.333
+status = activated
+ambient = 0.333 0.333 0.333
+[light2]
+diffuse = 0.333 0.333 0.333
+status = not activated
+ambient = 0.333 0.333 0.333
+[angle]
+position = 0 0 0
+status = not activated
+right = 1 2 0
+left = -1 2 0
+[resolution]
+resolution = 0.0047
+unit = mm
+displayunit = mm
+[rendering]
+background = 0 0 0 255
+intensity = 0.333
+colormode = activated
+quickmode = activated
+algorithm = scatterhq
+{camera1}
+[viewer]
+perspective = activated
+viewingangle = 30
+position = 0 5940.32 0
+oversampling = 1
+up = 0 0 1
+lookat = 0 0 0
+resultsize = 256 256
+[perspective]
+status = activated
+[rendering]
+colormode = activated
+quickmode = activated
+algorithm = scatterhq
