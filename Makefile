@@ -5,11 +5,15 @@ MINGWFLAGS=-m64 -Wall -O -std=c99
 
 CC=gcc
 MINGWCC=x86_64-w64-mingw32-gcc.exe
+CLANG=clang
 
 all:	rescale rescale16
 
 rescale:
 	$(CC) $(CFLAGS) -o rescale rescale.c
+
+mac:
+	$(CLANG) -o rescale rescale.c	
 
 rescale_dbg:
 	$(CC) -g -o rescale_dbg rescale.c
@@ -28,4 +32,3 @@ prof:
 
 windows:
 	$(MINGWCC) $(MINGWFLAGS) -o rescale.exe rescale.c
-

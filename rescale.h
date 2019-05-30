@@ -57,6 +57,8 @@ void info();
 
 void usage();
 
+int read_vgi(char *vgi_filename); 
+
 int read_first_value(char *filename, raw_t *target);
 
 uint64_t find_minmax_values(char *filename, raw_t *minval, raw_t *maxval, uint64_t total_size_read, uint64_t total_size_input, uint64_t bufcount, raw_t *buffer, time_t clk_split);
@@ -67,4 +69,5 @@ uint64_t calculate_number_of_values(uint64_t *histogram, int nbins);
 
 void convert_data(char *input_file, char *output_file, raw_t *inbuffer, unsigned char *outbuffer, float lowval, float scalerange, uint64_t buffer_count, uint64_t *total_size_read,  uint64_t *total_size_written,  uint64_t total_size_input);
 
+void strip_ext();
 #endif

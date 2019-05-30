@@ -93,16 +93,19 @@ int read_vgi(char *vgi_filename)
   if (input_file == NULL)
     {
       printf("Error opening .vgi file - are you sure it's in the same dir?");
-      return ERR_FAILED_TO_OPEN_VGI_FILE 11
+      return ERR_FAILED_TO_OPEN_VGI_FILE;
     }
   while (fgets(line, sizeof line, input_file) != NULL)
   {
     if (count == 3)
     {
-     printf("%s\n", line)
+     printf("HERE IT IS!!!!!");
+     printf("%s\n", line);
      //do something here
     }
   }
+  fclose(input_file);
+  return 0;
 }
 int read_first_value(char *filename, raw_t *target)
 {
@@ -285,6 +288,19 @@ void convert_data(char *input_file, char *output_file, raw_t *inbuffer, unsigned
   fclose(infile);
 }
 
+void strip_ext(char *fname)
+{
+    char *end = fname + strlen(fname);
+
+    while (end > fname && *end != '.' && *end != '\\' && *end != '/') {
+        --end;
+    }
+    if ((end > fname && *end == '.') &&
+        (*(end - 1) != '\\' && *(end - 1) != '/')) {
+        *end = '\0';
+    }
+}
+
 int main(int argc, char **argv)
 {
   int i, opt, a; /* signed int counter, option counter, absolute argument counter */
@@ -305,7 +321,7 @@ int main(int argc, char **argv)
   char **output_files; /* names of output files */
   char *processed_suffix; /* suffix for output files */
   uint64_t buffer_count; /* number of elements in a buffer */
-
+  char *vgifile;
   /* initialise some values */
   i = 0;
   nvals = 0;
@@ -462,7 +478,15 @@ int main(int argc, char **argv)
   printf("Saturation threshold set - percentiles between %0.2f%% and %0.2f%% will be considered\n", 100*t_low, 100*t_high);
 
 
-
+  printf("Reading .vgi file...");
+  vgifile = argv;
+  strip_ext(vgifile);
+  strcat(vgifile, ".vgi");
+  printf(".vgi name is %s\n", vgifile);
+  if (read_vgi(vgifile) != 0)
+  {
+    return ERR_FAILED_TO_OPEN_VGI_FILE;
+  }
   // printf("&maxval is %f\n\n\n", &maxval);
   /* read the first value of the first file and assign this to max/minval */
    if (read_first_value(input_files[0], &maxval) != 0)
