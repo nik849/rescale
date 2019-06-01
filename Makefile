@@ -13,7 +13,7 @@ rescale:
 	$(CC) $(CFLAGS) -o rescale rescale.c
 
 mac:
-	$(CLANG) -o rescale rescale.c	
+	$(CLANG) $(CFLAGS) -o rescale rescale.c	
 
 rescale_dbg:
 	$(CC) -g -o rescale_dbg rescale.c

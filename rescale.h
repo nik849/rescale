@@ -11,10 +11,10 @@ const char *RESCALE_DTYPE = "32-bit floating point";
 
 /* version */
 const char *RESCALE_NAME = "rescale";
-const char *RESCALE_VERSION = "0.0.3";
-const char *RESCALE_AUTHORS = "Dr. Richard Boardman, Dr. Neil O'Brien";
+const char *RESCALE_VERSION = "0.0.4";
+const char *RESCALE_AUTHORS = "Dr. Richard Boardman, Dr. Neil O'Brien, Nick Hale";
 const char *RESCALE_MUVIS = "µ-VIS X-ray Imaging Centre";
-const char *RESCALE_COPYRIGHT = "Copyright (c) 2016, 2017 University of Southampton";
+const char *RESCALE_COPYRIGHT = "Copyright (c) 2016, 2017, 2019 University of Southampton";
 
 /* default values */
 
@@ -57,7 +57,7 @@ void info();
 
 void usage();
 
-int read_vgi(char *vgi_filename); 
+int read_vgi(char *vgi_filename, int x, int y, int z);
 
 int read_first_value(char *filename, raw_t *target);
 

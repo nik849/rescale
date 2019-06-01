@@ -64,6 +64,9 @@ void usage()
   printf("\twill become foo.raw.8bit.out. Default value is %s\n", PROCESSED_SUFFIX);
   printf(" -n n\tSets the number of histogram bins to n. Setting a value less than 1 will fail.\n");
   printf("\tDefault value is %d\n", DEFAULT_HISTOGRAM_BINS);
+  printf("*NEW* -a\tSets output name to Auto - this looks for the corresponding .vgi file in the\n");
+  printf("\tsame directory as the .vol and try to extract the size of the volume and append to the\n");
+  printf("\toutput filename.");
 #ifdef UINT16
   printf("Please note that the %s version will not consider values\n", RESCALE_DTYPE);
   printf("of 0 or 65535 in the scaling - these are known saturated values\n");
@@ -84,25 +87,26 @@ int64_t get_filesize(const char *filename)
     }
   return -1;
 }
-int read_vgi(char *vgi_filename)
+int read_vgi(char *vgi_filename, int x, int y, int z)
 {
   int count = 0;
-  char *x, *y, *z;
   char line[256];
   FILE *input_file = fopen(vgi_filename, "rb");
   if (input_file == NULL)
     {
-      printf("Error opening .vgi file - are you sure it's in the same dir?");
+      printf("Error opening .vgi file, check it exists...");
       return ERR_FAILED_TO_OPEN_VGI_FILE;
     }
   while (fgets(line, sizeof line, input_file) != NULL)
   {
-    if (count == 3)
-    {
-     printf("HERE IT IS!!!!!");
-     printf("%s\n", line);
-     //do something here
+    if (strstr(line, "size =") != NULL) {
+      printf("%s\n", line);
+      sscanf(line, "%*[^0123456789]%d%*[^0123456789]%d%*[^0123456789]%d", &x, &y, &z);
+      printf("Size will be: %d by %d by %d\n", x, y, z);
+      break;
     }
+    //printf(line);
+    count++;
   }
   fclose(input_file);
   return 0;
@@ -301,6 +305,7 @@ void strip_ext(char *fname)
     }
 }
 
+char
 int main(int argc, char **argv)
 {
   int i, opt, a; /* signed int counter, option counter, absolute argument counter */
@@ -321,7 +326,9 @@ int main(int argc, char **argv)
   char **output_files; /* names of output files */
   char *processed_suffix; /* suffix for output files */
   uint64_t buffer_count; /* number of elements in a buffer */
-  char *vgifile;
+  char *vgifile; /*vgi file for getting the size */
+  int x, y, z;
+  int auto_flag;
   /* initialise some values */
   i = 0;
   nvals = 0;
@@ -348,7 +355,7 @@ int main(int argc, char **argv)
     }
 
   /* handle command-line options */
-  while ((opt = getopt(argc, argv, "hb:t:s:n:")) != -1)
+  while ((opt = getopt(argc, argv, "hb:t:s:n:a:")) != -1)
     {
       switch(opt)
 	{
@@ -387,6 +394,24 @@ int main(int argc, char **argv)
 	  snprintf(processed_suffix, sizeof(char)+(1+strlen(optarg)), "%s", optarg);
 	  printf("Output suffix set to %s\n", processed_suffix);
 	  break;
+  case 'a':
+    /* set the output string to auto, from vgi file */
+    auto_flag = 1;
+    free(processed_suffix);
+  	char processed_suffix[100] = "";
+    printf("Reading .vgi file...\n");
+    vgifile = argv[2];
+      //printf("Basename is %s\n", vgifile);
+    strip_ext(vgifile);
+    strcat(vgifile, ".vgi");
+    printf(".vgi name is %s\n", vgifile);
+    if (read_vgi(vgifile, x, y, z) != 0)
+    {
+      return ERR_FAILED_TO_OPEN_VGI_FILE;
+    }
+    snprintf(processed_suffix, sizeof(processed_suffix), "%dx%dx%dx8bit.raw", x, y, z);
+    printf("Output string set to Auto: %s\n", processed_suffix);
+    break;
 	case 'n':
 	  /* set the number of histogram bins */
 	  nbins = atoi(optarg);
@@ -396,9 +421,9 @@ int main(int argc, char **argv)
 	      return ERR_STUPID_CONSTRAINTS;
 	    }
 	  break;
-	default:
+  default:
 	  usage();
-	  return ERR_ARGUMENTS_BEYOND_RECOGNITION;
+    return ERR_ARGUMENTS_BEYOND_RECOGNITION;
 	}
     }
 
@@ -478,21 +503,13 @@ int main(int argc, char **argv)
   printf("Saturation threshold set - percentiles between %0.2f%% and %0.2f%% will be considered\n", 100*t_low, 100*t_high);
 
 
-  printf("Reading .vgi file...");
-  vgifile = argv;
-  strip_ext(vgifile);
-  strcat(vgifile, ".vgi");
-  printf(".vgi name is %s\n", vgifile);
-  if (read_vgi(vgifile) != 0)
-  {
-    return ERR_FAILED_TO_OPEN_VGI_FILE;
-  }
+
   // printf("&maxval is %f\n\n\n", &maxval);
   /* read the first value of the first file and assign this to max/minval */
-   if (read_first_value(input_files[0], &maxval) != 0)
-    {
-      return ERR_FAILED_TO_OPEN_THE_FILE_DESPITE_EVERYTHING_ELSE;
-    }
+  if (read_first_value(input_files[0], &maxval) != 0)
+  {
+    return ERR_FAILED_TO_OPEN_THE_FILE_DESPITE_EVERYTHING_ELSE;
+  }
 
   minval = maxval;
   printf("Read first value: maxval is %0.4f, minval is %0.4f\n", (float)maxval, (float)minval);
