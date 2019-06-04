@@ -292,6 +292,25 @@ void convert_data(char *input_file, char *output_file, raw_t *inbuffer, unsigned
   fclose(infile);
 }
 
+char read_update_size_vgi()
+{
+  free(processed_suffix);
+  char processed_suffix[100] = "";
+  printf("Reading .vgi file...\n");
+  vgifile = argv[2];
+    //printf("Basename is %s\n", vgifile);
+  strip_ext(vgifile);
+  strcat(vgifile, ".vgi");
+  printf(".vgi name is %s\n", vgifile);
+  if (read_vgi(vgifile, x, y, z) != 0)
+  {
+    return ERR_FAILED_TO_OPEN_VGI_FILE;
+  }
+  snprintf(processed_suffix, sizeof(processed_suffix), "%dx%dx%dx8bit.raw", x, y, z);
+  printf("Output string set to Auto: %s\n", processed_suffix);
+  return processed_suffix;
+}
+
 void strip_ext(char *fname)
 {
     char *end = fname + strlen(fname);
@@ -397,20 +416,7 @@ int main(int argc, char **argv)
   case 'a':
     /* set the output string to auto, from vgi file */
     auto_flag = 1;
-    free(processed_suffix);
-  	char processed_suffix[100] = "";
-    printf("Reading .vgi file...\n");
-    vgifile = argv[2];
-      //printf("Basename is %s\n", vgifile);
-    strip_ext(vgifile);
-    strcat(vgifile, ".vgi");
-    printf(".vgi name is %s\n", vgifile);
-    if (read_vgi(vgifile, x, y, z) != 0)
-    {
-      return ERR_FAILED_TO_OPEN_VGI_FILE;
-    }
-    snprintf(processed_suffix, sizeof(processed_suffix), "%dx%dx%dx8bit.raw", x, y, z);
-    printf("Output string set to Auto: %s\n", processed_suffix);
+    printf("Will attempt to read size automatically from .vgi file.\n");
     break;
 	case 'n':
 	  /* set the number of histogram bins */
