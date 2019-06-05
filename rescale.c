@@ -95,7 +95,6 @@ int read_first_value(char *filename, raw_t *target)
   raw_t value;
   int readcount;
   infile = fopen(filename, "rb");
-  printf("read_firstValue\n");
   if (infile == NULL)
     {
       printf("Error opening file %s\n", filename);
@@ -473,7 +472,7 @@ histogram[bin]++.  running valgrind reveals:
 
 ...trying to figure this out at the minute. */
   num_input_files = argc - optind; /* how many input files do we have? */
-  printf("%d\n", num_input_files);
+  //printf("%d\n", num_input_files);
   if (num_input_files < 1)
     {
       printf("Not enough arguments. Please provide the names of one or more ");
@@ -524,10 +523,10 @@ histogram[bin]++.  running valgrind reveals:
 	  printf("Total size to read is now %" PRIu64 " (%0.4f GiB)\n", total_size_input, (float)total_size_input / GIBI);
 
 	  /* add this to the list */
-	  input_files[i] = (char *)malloc(sizeof(char) * (1+strlen(argv[a])));
-    output_files[i] = (char *)malloc(sizeof(char) * (1+strlen(argv[a])+strlen(processed_suffix)));
-	  snprintf(input_files[i], sizeof(char)*(1+strlen(argv[a])), "%s", argv[a]);
-	  snprintf(output_files[i], sizeof(char)*(1+strlen(argv[a])+strlen(processed_suffix)), "%s%s", argv[a], processed_suffix);
+	  input_files[i] = (char *)malloc(sizeof(char) * (5+strlen(argv[a])));
+    output_files[i] = (char *)malloc(sizeof(char) * (5+strlen(argv[a])+strlen(processed_suffix)));
+	  snprintf(input_files[i], sizeof(char)*(5+strlen(argv[a])), "%s", argv[a]);
+	  snprintf(output_files[i], sizeof(char)*(5+strlen(argv[a])+strlen(processed_suffix)), "%s%s", argv[a], processed_suffix);
 	  printf("Added file %s to the list of output files\n", output_files[i]);
     }
   printf("\n");
