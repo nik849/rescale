@@ -185,7 +185,7 @@ uint64_t find_minmax_values(char *filename, raw_t *minval, raw_t *maxval, uint64
   return total_size_read;
 }
 
-uint64_t _histogram(char *filename, uint64_t *histogram, raw_t minval, float bin_factor, uint64_t total_size_read, uint64_t total_size_input, uint64_t bufcount, raw_t *buffer, time_t clk_split)
+uint64_t build_histogram(char *filename, uint64_t *histogram, raw_t minval, float bin_factor, uint64_t total_size_read, uint64_t total_size_input, uint64_t bufcount, raw_t *buffer, time_t clk_split)
 {
   FILE *infile;
   uint64_t u;
