@@ -452,9 +452,26 @@ int main(int argc, char **argv)
      number of bins is requested. Cost: sizeof(uint64_t) in
      memory, and no difference in behaviour (other than it no longer
      segfaults) as we're still only working up to nbins in our loop. */
+     histogram = malloc(sizeof(uint64_t) * nbins);//(uint64_t *)malloc(sizeof(uint64_t *) * nbins);
+  //histogram = (uint64_t *)calloc(nbins + (nbins % 2), sizeof(uint64_t));
 
-  histogram = (uint64_t *)calloc(nbins + (nbins % 2), sizeof(uint64_t));
+/* This compiles fine on mac (clang8.0), but will segfault at line 217
+histogram[bin]++.  running valgrind reveals:
+==23305== Invalid read of size 8
+==23305==    at 0x109DA9: build_histogram (rescale.c:217)
+==23305==    by 0x10B030: main (rescale.c:556)
+==23305==  Address 0x4ae0530 is 0 bytes after a block of size 524,288 alloc'd
+==23305==    at 0x483AB65: calloc (vg_replace_malloc.c:752)
+==23305==    by 0x10A92A: main (rescale.c:456)
+==23305==
+==23305== Invalid write of size 8
+==23305==    at 0x109DB1: build_histogram (rescale.c:217)
+==23305==    by 0x10B030: main (rescale.c:556)
+==23305==  Address 0x4ae0530 is 0 bytes after a block of size 524,288 alloc'd
+==23305==    at 0x483AB65: calloc (vg_replace_malloc.c:752)
+==23305==    by 0x10A92A: main (rescale.c:456)
 
+...trying to figure this out at the minute. */
   num_input_files = argc - optind; /* how many input files do we have? */
   printf("%d\n", num_input_files);
   if (num_input_files < 1)
