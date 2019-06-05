@@ -64,7 +64,7 @@ void usage()
   printf("\twill become foo.raw.8bit.out. Default value is %s\n", PROCESSED_SUFFIX);
   printf(" -n n\tSets the number of histogram bins to n. Setting a value less than 1 will fail.\n");
   printf("\tDefault value is %d\n", DEFAULT_HISTOGRAM_BINS);
-  printf("*NEW* -a\tSets output name to Auto - this looks for the corresponding .vgi file in the\n");
+  printf(" -a\t*NEW* Sets output name to Auto - this looks for the corresponding .vgi file in the\n");
   printf("\tsame directory as the .vol and try to extract the size of the volume and append to the\n");
   printf("\toutput filename.");
 #ifdef UINT16
@@ -293,7 +293,7 @@ char *read_update_size_vgi(char *vgifile, int x, int y, int z)
     while (fgets(line, sizeof line, input_file) != NULL)
     {
       if (strstr(line, "size =") != NULL) {
-        printf("%s\n", line);
+        //printf("%s\n", line);
         sscanf(line, "%*[^0123456789]%d%*[^0123456789]%d%*[^0123456789]%d", &x, &y, &z);
         printf("Size will be: %d by %d by %d\n", x, y, z);
         break;
