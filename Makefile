@@ -1,7 +1,7 @@
 CFLAGS=-m64 -Wall -mtune=native -O3 -std=c99
 #CFLAGS=-m64 -Wall -mtune=native -O2 -std=c99
 #CFLAGS=-g
-MINGWFLAGS=-Wall -O -std=c99
+MINGWFLAGS=-m64 -Wall -O -std=c99
 MACFLAGS=-Wall -O -std=c99
 
 CC=gcc
@@ -35,4 +35,4 @@ prof:
 	$(CC) -g -pg -o rescale-prof rescale.c
 
 windows:
-	$(MINGWCC) $(MINGWFLAGS) -o rescale.exe rescale.c
+	$(MINGWCC) $(MACFLAGS) -o rescale.exe rescale.c
