@@ -1,11 +1,11 @@
 CFLAGS=-m64 -Wall -mtune=native -O3 -std=c99
 #CFLAGS=-m64 -Wall -mtune=native -O2 -std=c99
 #CFLAGS=-g
-MINGWFLAGS=-m64 -Wall -O -std=c99
+MINGWFLAGS=-Wall -O -std=c99
 MACFLAGS=-Wall -O -std=c99
 
 CC=gcc
-MINGWCC=x86_64-w64-mingw32-gcc.exe
+MINGWCC=i686-w64-mingw32-gcc#x86_64-w64-mingw32-gcc.exe
 CLANG=clang
 
 all:	rescale rescale16
