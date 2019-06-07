@@ -95,7 +95,6 @@ int read_first_value(char *filename, raw_t *target)
   raw_t value;
   int readcount;
   infile = fopen(filename, "rb");
-  printf("read_firstValue\n");
   if (infile == NULL)
     {
       printf("Error opening file %s\n", filename);
@@ -276,7 +275,7 @@ char *read_update_size_vgi(char *vgifile, int x, int y, int z)
   char line[256];
   FILE *input_file = fopen(vgifile, "rb");
   int failed = 0;
-  char *output_filename = malloc(1028);
+  char *output_filename = malloc(sizeof(char *) * 1028);
   printf(".vgi name is %s\n", vgifile);
   if (input_file == NULL)
     {
@@ -343,7 +342,7 @@ int main(int argc, char **argv)
   char **output_files; /* names of output files */
   char *processed_suffix; /* suffix for output files */
   uint64_t buffer_count; /* number of elements in a buffer */
-  int x, y, z;
+  int x, y, z; /* sizes of the volume, read from .vgi file */
   int auto_flag;
   char *vol_file_name;
   /* initialise some values */
@@ -413,7 +412,7 @@ int main(int argc, char **argv)
 	  /* assign a new suffix */
 	  free(processed_suffix);
 	  processed_suffix = realloc(NULL, sizeof(char)+(1+strlen(optarg)));
-	  snprintf(processed_suffix, sizeof(char)+(1+strlen(optarg)), "%s", optarg);
+	  snprintf(processed_suffix, sizeof(char)*(1+strlen(optarg)), "%s", optarg);
 	  printf("Output suffix set to %s\n", processed_suffix);
 	  break;
   case 'a':
@@ -452,11 +451,9 @@ int main(int argc, char **argv)
      number of bins is requested. Cost: sizeof(uint64_t) in
      memory, and no difference in behaviour (other than it no longer
      segfaults) as we're still only working up to nbins in our loop. */
-
-  histogram = (uint64_t *)calloc(nbins + (nbins % 2), sizeof(uint64_t));
-
+  histogram = malloc(sizeof(uint64_t *) * 1028);//(uint64_t *)malloc(sizeof(uint64_t *) * nbins);
   num_input_files = argc - optind; /* how many input files do we have? */
-  printf("%d\n", num_input_files);
+  //printf("%d\n", num_input_files);
   if (num_input_files < 1)
     {
       printf("Not enough arguments. Please provide the names of one or more ");
@@ -507,10 +504,10 @@ int main(int argc, char **argv)
 	  printf("Total size to read is now %" PRIu64 " (%0.4f GiB)\n", total_size_input, (float)total_size_input / GIBI);
 
 	  /* add this to the list */
-	  input_files[i] = (char *)malloc(sizeof(char) * (1+strlen(argv[a])));
-    output_files[i] = (char *)malloc(sizeof(char) * (1+strlen(argv[a])+strlen(processed_suffix)));
-	  snprintf(input_files[i], sizeof(char)*(1+strlen(argv[a])), "%s", argv[a]);
-	  snprintf(output_files[i], sizeof(char)*(1+strlen(argv[a])+strlen(processed_suffix)), "%s%s", argv[a], processed_suffix);
+	  input_files[i] = (char *)malloc(sizeof(char) * (5+strlen(argv[a])));
+    output_files[i] = (char *)malloc(sizeof(char) * (5+strlen(argv[a])+strlen(processed_suffix)));
+	  snprintf(input_files[i], sizeof(char)*(5+strlen(argv[a])), "%s", argv[a]);
+	  snprintf(output_files[i], sizeof(char)*(5+strlen(argv[a])+strlen(processed_suffix)), "%s%s", argv[a], processed_suffix);
 	  printf("Added file %s to the list of output files\n", output_files[i]);
     }
   printf("\n");
